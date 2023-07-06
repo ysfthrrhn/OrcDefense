@@ -16,22 +16,28 @@ public class UpgradeTower : MonoBehaviour
         upgradeTool.transform.position = transform.position + offSet;
     }
 
+    // For open and close Tower Upgare UI
     private void OnMouseUpAsButton()
     {
         
         if (upgradeTool.activeSelf)
         {
-            StopAllCoroutines();
+            StopAllCoroutines();// If there is coroutine still working after object enabled again, It will be disable the GameObject
             upgradeTool.SetActive(false);
             return;
         }
         upgradeTool.SetActive(true);
         StartCoroutine(DisableGameObject());
     }
+
+    /// <summary>
+    /// Disables Upgrade UI
+    /// </summary>
+    /// <returns></returns>
     IEnumerator DisableGameObject()
     {
         yield return new WaitForSecondsRealtime(duration);
         upgradeTool.SetActive(false);
-        StopAllCoroutines();
+        StopAllCoroutines(); // If there is coroutine still working after object enabled again, It will be disable the GameObject
     }
 }

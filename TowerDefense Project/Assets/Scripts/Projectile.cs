@@ -4,13 +4,6 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    /*public Projectile(public float damage, public float poisonDamage, public float slowingRate, public float armorPiercing)
-    {
-        damage=0;
-        poisonDamage=0;
-        slowingRate=0;
-        armorPiercing = 0;
-    }*/
     float damage;
     float poisonDamage;
     float poisonDuration;
@@ -29,6 +22,7 @@ public class Projectile : MonoBehaviour
 
     bool hitCheck = false;
     
+    // Default values of projectile;
     public void Awake()
     {
         damage = 0;
@@ -37,6 +31,10 @@ public class Projectile : MonoBehaviour
         armorPiercing = 0;
         speed = 10f;
     }
+
+    /// <summary>
+    /// Change projectile by tower mode
+    /// </summary>
     public void InstantiateBullet()
     {
         if (Type==TowerMode.Standard)
@@ -56,23 +54,29 @@ public class Projectile : MonoBehaviour
             GetComponent<MeshRenderer>().material.color = Color.red;
         }
     }
+
+    /// <summary>
+    /// Set target to projectile
+    /// </summary>
+    /// <param name="_target"></param>
     public void Chase(GameObject _target) {
         target = _target.transform;
     }
 
     
     void Update() {
-        if (target == null || target.GetComponent<Enemy>().isDead || !target.gameObject.activeSelf)
+        
+        if (target == null || target.GetComponent<Enemy>().isDead || !target.gameObject.activeSelf) // Check for target
         {
             SendToPool();
-            return; // bazen yoketme zaman alabilir yok etmesini beklememiz lazým
+            return; 
         }
 
-        if (Type == TowerMode.Area)
+        if (Type == TowerMode.Area) // Checking for Aoe tower for how to move the projectile to target.
         {
-            StartCoroutine((Curve()));
+            StartCoroutine((Curve())); // Moving projectile with curve to the target
         }
-        else
+        else // Moving projectile directly to the target
         {
             Vector3 dir = (target.transform.position - transform.position).normalized;
             float distanceThisFrame = speed * Time.deltaTime;
@@ -85,20 +89,27 @@ public class Projectile : MonoBehaviour
             transform.Translate(dir.normalized * distanceThisFrame, Space.World);
         }
     }
+
+    // When reached to target
     private void OnTriggerEnter(Collider collision)
     {
         if (collision.gameObject.tag == "Enemy" && Type != TowerMode.Area)
         {
             hitCheck = true;
             collision.gameObject.GetComponent<Enemy>().GetDamage(damage, poisonDamage, poisonDuration, slowingRate, armorPiercing, Type);
-            HitTarget();
+            SendToPool();
         }
     }
     
-    void HitTarget()
-    {
-        SendToPool();
-    }
+    /// <summary>
+    /// Sets projectile's rates.
+    /// </summary>
+    /// <param name="damageValue"></param>
+    /// <param name="poisonDamageValue"></param>
+    /// <param name="poisonDurationValue"></param>
+    /// <param name="slowingRateValue"></param>
+    /// <param name="armorPiercingValue"></param>
+    /// <param name="speedValue"></param>
     public void SetDamageRates(float damageValue, float poisonDamageValue, float poisonDurationValue, float slowingRateValue, float armorPiercingValue, float speedValue)
     {
         damage=damageValue;
@@ -108,17 +119,23 @@ public class Projectile : MonoBehaviour
         armorPiercing=armorPiercingValue;
         speed=speedValue;
     }
+
+
     public void SetType(TowerMode m) //Change tower type (Will be used next versions)
     {                                        
         Type = m;
         InstantiateBullet();
     }
 
-    public void SetAEOStart(Transform t)
+    public void SetAEOStart(Transform t) // Setting start point for aoe projectile
     {
         start = t.position;
     }
-    
+
+    /// <summary>
+    /// Moves projectile with curve to the target and if hits deals damage.
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Curve()
     {
         float duration = 1.50f; //projectile flight duration
@@ -154,6 +171,10 @@ public class Projectile : MonoBehaviour
         SendToPool();
         StopCoroutine(Curve());
     }
+
+    /// <summary>
+    /// Sends projectile back to the pool.
+    /// </summary>
     void SendToPool()
     {
         hitCheck = false;

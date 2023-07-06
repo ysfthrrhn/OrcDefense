@@ -38,14 +38,89 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        HandleKeyboardInput();
         HandleMovemntImput();
         HandleMouseInput();
         
+        #if UNITY_IOS || UNITY_ANDROID
+            HandleTouchInput();
+        #endif
     }
+    //For touch input
+    void HandleTouchInput()
+    {
+        if (Input.touchCount == 2 && Input.GetTouch(0).phase != TouchPhase.Stationary && Input.GetTouch(1).phase != TouchPhase.Stationary)
+        {
+            Touch touchZero = Input.GetTouch(0);
+            Touch touchOne = Input.GetTouch(1);
 
+            Vector3 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+            Vector3 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+
+            float prevMagnitude = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+            float currentMagnitude = (touchZero.position - touchOne.position).magnitude;
+
+            float diffrence = currentMagnitude - prevMagnitude;
+            newZoom += new Vector3(0, diffrence * zoomAmount.y / 10, diffrence * zoomAmount.z / 10);
+        }
+        if (Input.touchCount >= 2)
+        {
+            if (Input.GetTouch(0).phase == TouchPhase.Stationary)
+            {
+                rotateStartPosition = Input.GetTouch(0).position;
+            }
+            if (Input.GetTouch(1).phase == TouchPhase.Stationary)
+            {
+                rotateStartPosition = Input.GetTouch(0).position;
+            }
+        }
+        if (Input.touchCount == 1)
+        {
+            if (Input.GetTouch(0).phase == TouchPhase.Stationary)
+            {
+                rotateStartPosition = Input.GetTouch(0).position;
+            }
+        }
+
+        if (Input.touchCount == 2 && ((Input.GetTouch(0).phase != TouchPhase.Stationary && Input.GetTouch(1).phase == TouchPhase.Stationary) || (Input.GetTouch(0).phase == TouchPhase.Stationary && Input.GetTouch(1).phase != TouchPhase.Stationary)))
+        {
+            if (Input.GetTouch(0).phase == TouchPhase.Stationary)
+            {
+                //rotateStartPosition = Input.GetTouch(0).position;
+                rotateCurrentPosition = Input.GetTouch(1).position;
+                Vector3 difference = rotateStartPosition - rotateCurrentPosition;
+                rotateStartPosition = rotateCurrentPosition;
+                if (difference.x > 0)
+                {
+                    newRotation *= Quaternion.Euler(Vector3.up * (difference.x / 500f));
+                }
+                else
+                {
+                    newRotation *= Quaternion.Euler(Vector3.up * (-difference.x / 500f));
+                }
+            }
+            if (Input.GetTouch(1).phase == TouchPhase.Stationary)
+            {
+                //rotateStartPosition = Input.GetTouch(0).position;
+                rotateCurrentPosition = Input.GetTouch(0).position;
+                Vector3 difference = rotateStartPosition - rotateCurrentPosition;
+                rotateStartPosition = rotateCurrentPosition;
+                if (difference.x < 0)
+                {
+                    newRotation *= Quaternion.Euler(Vector3.up * (-difference.x / 500f));
+                }
+                else
+                {
+                    newRotation *= Quaternion.Euler(Vector3.up * (difference.x / 500f));
+                }
+            }
+
+        }
+    }
+    //For mouse input
     void HandleMouseInput()
     {
-        if (Input.GetMouseButtonDown(0) && Input.touchCount != 2)
+        if (Input.GetMouseButtonDown(0))
         {
             Plane plane = new Plane(Vector3.up, Vector3.zero);
 
@@ -58,7 +133,7 @@ public class CameraController : MonoBehaviour
                 dragStartPosition = ray.GetPoint(entry);
             }
         }
-        if (Input.GetMouseButton(0) && Input.touchCount != 2)
+        if (Input.GetMouseButton(0))
         {
             Plane plane = new Plane(Vector3.up, Vector3.zero);
 
@@ -72,14 +147,7 @@ public class CameraController : MonoBehaviour
                 newPosition = transform.position + dragStartPosition - dragCurrentPosition;
             }
         }
-        //if (Input.GetAxis("Mouse ScrollWheel") > 0f)
-        //{
-        //    newZoom += zoomAmount * 5;
-        //}
-        //if (Input.GetAxis("Mouse ScrollWheel") < 0f)
-        //{
-        //    newZoom -= zoomAmount * 5;
-        //}
+        
         if (Input.mouseScrollDelta.y != 0)
         {
             newZoom += Input.mouseScrollDelta.y * zoomAmount * 5;
@@ -97,82 +165,12 @@ public class CameraController : MonoBehaviour
             Vector3 difference = rotateStartPosition - rotateCurrentPosition;
             rotateStartPosition = rotateCurrentPosition;
             newRotation *= Quaternion.Euler(Vector3.up * (-difference.x / 5f));
-        }
-        if (Input.touchCount == 2 && Input.GetTouch(0).phase != TouchPhase.Stationary && Input.GetTouch(1).phase != TouchPhase.Stationary)
-        {
-            Touch touchZero = Input.GetTouch(0);
-            Touch touchOne = Input.GetTouch(1);
-
-            Vector3 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
-            Vector3 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
-
-            float prevMagnitude = (touchZeroPrevPos - touchOnePrevPos).magnitude;
-            float currentMagnitude = (touchZero.position - touchOne.position).magnitude;
-
-            float diffrence = currentMagnitude - prevMagnitude;
-            newZoom += new Vector3(0, diffrence * zoomAmount.y/10, diffrence * zoomAmount.z / 10);
-        }
-        if(Input.touchCount >= 2)
-        {
-            if(Input.GetTouch(0).phase == TouchPhase.Stationary)
-            {
-                rotateStartPosition = Input.GetTouch(0).position;
-            }
-            if (Input.GetTouch(1).phase == TouchPhase.Stationary)
-            {
-                rotateStartPosition = Input.GetTouch(0).position;
-            }
-        }
-        if(Input.touchCount == 1)
-        {
-            if (Input.GetTouch(0).phase == TouchPhase.Stationary)
-            {
-                rotateStartPosition = Input.GetTouch(0).position;
-            }
-        }
+        }     
         
-        if (Input.touchCount == 2 && ((Input.GetTouch(0).phase != TouchPhase.Stationary && Input.GetTouch(1).phase == TouchPhase.Stationary) || (Input.GetTouch(0).phase == TouchPhase.Stationary && Input.GetTouch(1).phase != TouchPhase.Stationary)))
-        {
-            if(Input.GetTouch(0).phase == TouchPhase.Stationary)
-            {
-                //rotateStartPosition = Input.GetTouch(0).position;
-                rotateCurrentPosition = Input.GetTouch(1).position;
-                Vector3 difference = rotateStartPosition - rotateCurrentPosition;
-                rotateStartPosition = rotateCurrentPosition;
-                if (difference.x > 0)
-                {
-                    Debug.LogError("ilk ife girdi");
-                    newRotation *= Quaternion.Euler(Vector3.up * (difference.x / 500f));
-                }
-                else
-                {
-                    Debug.LogError("ilk else e girdi");
-                    newRotation *= Quaternion.Euler(Vector3.up * (-difference.x / 500f));
-                }
-            }
-            if (Input.GetTouch(1).phase == TouchPhase.Stationary)
-            {
-                //rotateStartPosition = Input.GetTouch(0).position;
-                rotateCurrentPosition = Input.GetTouch(0).position;
-                Vector3 difference = rotateStartPosition - rotateCurrentPosition;
-                rotateStartPosition = rotateCurrentPosition;
-                if (difference.x < 0)
-                {
-                    Debug.LogError("ikinci ife girdi");
-                    newRotation *= Quaternion.Euler(Vector3.up * (-difference.x / 500f));
-                }
-                else
-                {
-                    Debug.LogError("ikinci else e girdi");
-                    newRotation *= Quaternion.Euler(Vector3.up * (difference.x / 500f));
-                }
-            }
-            
-        }
 
 
     }
-    void HandleMovemntImput()
+    void HandleKeyboardInput()
     {
         if (Input.GetKey(KeyCode.LeftShift))
         {
@@ -182,20 +180,20 @@ public class CameraController : MonoBehaviour
         {
             movementSpeed = normalSpeed;
         }
-        
-        if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
             newPosition += (transform.forward * movementSpeed);
         }
-        if(Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
             newPosition += (transform.forward * -movementSpeed);
         }
-        if(Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
             newPosition += (transform.right * movementSpeed);
         }
-        if(Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.DownArrow))
         {
             newPosition += (transform.right * -movementSpeed);
         }
@@ -207,22 +205,24 @@ public class CameraController : MonoBehaviour
         {
             newRotation *= Quaternion.Euler(Vector3.up * -rotationAmount);
         }
-        if(Input.GetKey(KeyCode.R))
+        if (Input.GetKey(KeyCode.R))
         {
             newZoom += zoomAmount;
         }
-        if(Input.GetKey(KeyCode.F))
+        if (Input.GetKey(KeyCode.F))
         {
             newZoom -= zoomAmount;
         }
-        
-        
-        
-
+    }
+    //For move the camera
+    void HandleMovemntImput()
+    {
+        //Applys change amount to transform
         transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * movementTime);
         transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, Time.deltaTime * movementTime);
         cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, newZoom, Time.deltaTime * movementTime);
 
+        //Checking for map limits
         if (transform.position.x < moveLimits[0].position.x)
         {
             newPosition.x = moveLimits[0].position.x;

@@ -6,13 +6,17 @@ public class Waypoints : MonoBehaviour
 {
     public Transform[] waypoints;
 
-    private void Awake()
+    private void Awake() // Get way points if not assaigned
     {
-        waypoints = new Transform[transform.childCount];
-
-        for (var i =0; i< waypoints.Length; i++)
+        if(waypoints.Length == 0)
         {
-            waypoints[i] = transform.GetChild(i);
+            waypoints = new Transform[transform.childCount];
+
+            for (var i = 0; i < waypoints.Length; i++)
+            {
+                waypoints[i] = transform.GetChild(i);
+            }
         }
+        
     }
 }

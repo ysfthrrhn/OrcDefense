@@ -9,6 +9,7 @@ public class UserHealthBar : MonoBehaviour
     float healt=20;
     float totalHealth=20;
     
+    // Updating players health bar when enemy reached and killing the enemy
     private void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.transform.tag == "Enemy")
@@ -22,6 +23,9 @@ public class UserHealthBar : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Calls function to open UI for showing level failed.
+    /// </summary>
     public void GameOver()
     {
         UIManager.Instance.OpenGameOverPanel();

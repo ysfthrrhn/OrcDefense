@@ -8,21 +8,24 @@ public class PathFinding : MonoBehaviour
     public Transform destination;
     public UnityEngine.AI.NavMeshAgent agent;
     private Enemy enemy;
-    // Update is called once per frame
+    
     private void Start()
     {
         enemy = gameObject.GetComponent<Enemy>();
         agent.enabled = true;
     }
+
+    // Setting TargetPoint to agent
     void Update()
     {
-        //targetPoint = GameObject.Find("TargetPoint");
         if (destination != null && !enemy.isDead)
         {
             agent.SetDestination(destination.position);
             
         }
     }
+
+    // When enemy reachs the banner
     private void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.tag == "Target")

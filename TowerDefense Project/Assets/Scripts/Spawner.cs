@@ -25,10 +25,9 @@ public class Spawner : MonoBehaviour
     [Header("Active Enemies Transform")]
     public Transform enemies;
 
-    private void Start()
-    {
-        waveCountDown = 2;
-    }
+    
+
+    // Checking for is current wave finished spawning
     private void Update()
     {
         if (waveCountDown <= 0)
@@ -43,6 +42,12 @@ public class Spawner : MonoBehaviour
             waveCountDown -= Time.deltaTime;
         }
     }
+
+    /// <summary>
+    /// Spawns given wave
+    /// </summary>
+    /// <param name="wave"></param>
+    /// <returns></returns>
     IEnumerator Spawn_Wave(Wave wave)
     {
         state = SpawnState.SPAWNING;
@@ -64,6 +69,10 @@ public class Spawner : MonoBehaviour
     }
 
     //EnemyType parameter will be used when more enemy types added!
+    /// <summary>
+    /// Spawns enemy at GameObject's positon.
+    /// </summary>
+    /// <param name="enemyType"></param>
     void Spawn_Enemy(Transform enemyType)
     {
         GameObject newEnemy = PoolManager.Instance.GetPooledEnemy();

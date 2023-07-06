@@ -33,6 +33,10 @@ public class TowerSelectorChild : MonoBehaviour
     public TextMeshProUGUI cost;
 
     private bool active;
+
+    public TowerTypes type;
+
+    // Getting type of tower
     void Start()
     {
         coin = Coin.Instance;
@@ -54,6 +58,8 @@ public class TowerSelectorChild : MonoBehaviour
                 throw new ArgumentOutOfRangeException();
         }
     }
+
+    // Disables UI after duration time when object enabled
     private void Update()
     {
         if(gameObject.activeSelf && !active)
@@ -63,7 +69,7 @@ public class TowerSelectorChild : MonoBehaviour
         }
     }
 
-    public TowerTypes type;
+    // When Clicked onto tower, Instantiate selected type of tower 
     private void OnMouseUpAsButton()
     {
         active = false;
@@ -112,6 +118,10 @@ public class TowerSelectorChild : MonoBehaviour
                 throw new ArgumentOutOfRangeException();
         }
     }
+
+    /// <summary>
+    /// Disables UI after duration time.
+    /// </summary>
     private void DisableParent()
     {
         transform.parent.parent.gameObject.SetActive(false);

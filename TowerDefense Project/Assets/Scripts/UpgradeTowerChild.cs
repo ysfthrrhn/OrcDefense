@@ -12,8 +12,8 @@ public enum UpgradeType
 }
 public class UpgradeTowerChild : MonoBehaviour
 {
-    public Mesh[] meshesBase; //Bu kule gövdesinin meshleri
-    public Mesh[] meshesTop; //Bu kule üst gövdesinin meshleri
+    public Mesh[] meshesBase; // Tower Mesh
+    public Mesh[] meshesTop; // Gun Mesh (Next version!!)
 
     [SerializeField]
     private GameObject _tower;
@@ -35,7 +35,8 @@ public class UpgradeTowerChild : MonoBehaviour
 
     private Coin coin;
     string currentMesh;
-    // Start is called before the first frame update
+    
+    // Set Type, get Info, and auto disable upgrade UI
     void Start()
     {
         coin = Coin.Instance;
@@ -57,6 +58,8 @@ public class UpgradeTowerChild : MonoBehaviour
         Invoke(nameof(DisableParent), duration);
         
     }
+
+    // For checking tower reached last level
     private void Update()
     {
         if (currentMesh == "tower3 Instance" && upgradeType == UpgradeType.UpgradeEnum)
@@ -71,6 +74,7 @@ public class UpgradeTowerChild : MonoBehaviour
         }
     }
     
+    // Upgrading tower if player has enough coin or downgrading tower
     private void OnMouseUpAsButton()
     {
         switch (upgradeType)
@@ -79,7 +83,7 @@ public class UpgradeTowerChild : MonoBehaviour
                 if(coin.GetCoin() >= 250)
                 {
                     coin.SetCoin(-250);
-                    Upgrade();
+                    UpgradeMesh();
                     DisableParent();
                 }
                 
@@ -87,7 +91,7 @@ public class UpgradeTowerChild : MonoBehaviour
                 break;
             case UpgradeType.DowngradeEnum:
                 DisableParent();
-                DowngradeTower();
+                DowngradeMesh();
                 break;
             default:
                 DisableParent();
@@ -96,7 +100,10 @@ public class UpgradeTowerChild : MonoBehaviour
         
     }
     
-    private void Upgrade()
+    /// <summary>
+    /// Upgrades towers mesh.
+    /// </summary>
+    private void UpgradeMesh()
     {
         currentMesh = _towerMesh.mesh.name;
         switch (currentMesh)
@@ -113,7 +120,11 @@ public class UpgradeTowerChild : MonoBehaviour
         }
         
     }
-    private void DowngradeTower()
+
+    /// <summary>
+    /// Downgrades towers mesh.
+    /// </summary>
+    private void DowngradeMesh()
     {
         currentMesh = _towerMesh.mesh.name;
         switch (currentMesh)
@@ -135,6 +146,9 @@ public class UpgradeTowerChild : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Upgrades towers damage.
+    /// </summary>
     private void UpgradeDamage()
     {
         var towerName = _tower.name;
@@ -155,6 +169,10 @@ public class UpgradeTowerChild : MonoBehaviour
                 break;
         }
     }
+
+    /// <summary>
+    /// Downgrades towers damage.
+    /// </summary>
     private void DowngradeDamage()
     {
         var towerName = _tower.name;
@@ -176,6 +194,10 @@ public class UpgradeTowerChild : MonoBehaviour
         }
         coin.SetCoin(150);
     }
+
+    /// <summary>
+    /// Closing UI
+    /// </summary>
     private void DisableParent()
     {
         transform.parent.parent.gameObject.SetActive(false);

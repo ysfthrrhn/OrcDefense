@@ -11,10 +11,13 @@ public class LevelStars : MonoBehaviour
     public GameObject starsFilled;
 
     private Button levelButton;
+
     private void Awake()
     {
         levelButton = GetComponent<Button>();
     }
+
+    // Checking for is levels passed and available
     private void Update()
     {
         if(gameObject.activeSelf)

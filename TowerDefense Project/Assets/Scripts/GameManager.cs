@@ -19,15 +19,12 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        InvokeRepeating(nameof(CheckEnemies), 10, 2.5f);
+        InvokeRepeating(nameof(CheckEnemies), 10, 2.5f); // Checks is level clear per 2.5 seconds
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    /// <summary>
+    /// Checks for spawners finished spawning and all enemies are dead.
+    /// </summary>
     private void CheckEnemies()
     {
         if(spawners.Count == 0)
@@ -46,6 +43,10 @@ public class GameManager : MonoBehaviour
             UIManager.Instance.OpenLevelSucceedPanel();
         }
     }
+
+    /// <summary>
+    /// Sets one enemy as dead from spawned enemies
+    /// </summary>
     public void SetEnemyDead()
     {
         for(int i = 0; i < enemies.Count; i++)

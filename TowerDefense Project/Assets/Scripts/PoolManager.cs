@@ -19,6 +19,7 @@ public class PoolManager : MonoBehaviour
     [SerializeField]
     private Transform bulletsTransform;
 
+    //Making Instance
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -30,6 +31,8 @@ public class PoolManager : MonoBehaviour
             Instance = this;
         }
     }
+
+    //Checking for pools at startup.
     void Start()
     {
         if (enemies.Count == 0)
@@ -49,6 +52,10 @@ public class PoolManager : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Instantiate desired number of enemies.
+    /// </summary>
+    /// <param name="initialPoolSize"></param>
     public void InitializeEnemyPool(int initialPoolSize)
     {
         for (int i = 0; i < initialPoolSize; i++)
@@ -58,6 +65,11 @@ public class PoolManager : MonoBehaviour
             enemies.Add(obj);
         }
     }
+
+    /// <summary>
+    /// Get enemy from pool.
+    /// </summary>
+    /// <returns></returns>
     public GameObject GetPooledEnemy()
     {
         if (enemies.Count == 0)
@@ -73,13 +85,22 @@ public class PoolManager : MonoBehaviour
 
         return pooledObject;
     }
-    public void ReturnEnemyToPool(GameObject obj)
+
+    /// <summary>
+    /// Return enemy to pool.
+    /// </summary>
+    /// <param name="obj"></param>
+    public void ReturnEnemyToPool(GameObject enemyObject)
     {
-        obj.SetActive(false);
-        obj.transform.parent = enemiesTransform;
-        enemies.Add(obj);
+        enemyObject.SetActive(false);
+        enemyObject.transform.parent = enemiesTransform;
+        enemies.Add(enemyObject);
     }
 
+    /// <summary>
+    /// Instantiate desired number of bullets.
+    /// </summary>
+    /// <param name="initialPoolSize"></param>
     public void InitializeBulletPool(int initialPoolSize)
     {
         for (int i = 0; i < initialPoolSize; i++)
@@ -89,6 +110,11 @@ public class PoolManager : MonoBehaviour
             enemies.Add(obj);
         }
     }
+
+    /// <summary>
+    /// Get bullet from pool.
+    /// </summary>
+    /// <returns></returns>
     public GameObject GetPooledBullet()
     {
         if (bullets.Count == 0)
@@ -103,10 +129,14 @@ public class PoolManager : MonoBehaviour
         bullets.RemoveAt(0);
         return pooledObject;
     }
-    public void ReturnBulletToPool(GameObject obj)
+    /// <summary>
+    /// Return bullet to pool.
+    /// </summary>
+    /// <param name="obj"></param>
+    public void ReturnBulletToPool(GameObject bulletObject)
     {
-        obj.SetActive(false);
-        obj.transform.parent = bulletsTransform;
-        bullets.Add(obj);
+        bulletObject.SetActive(false);
+        bulletObject.transform.parent = bulletsTransform;
+        bullets.Add(bulletObject);
     }
 }

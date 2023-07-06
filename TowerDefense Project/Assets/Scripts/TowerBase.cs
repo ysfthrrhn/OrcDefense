@@ -7,18 +7,15 @@ public class TowerBase : MonoBehaviour
     [SerializeField] private Enemy target;
     [SerializeField] private FindTarget findTargetScript;
     Enemy lastTarget;
+    
     [Header("Tower Attributes")]
 
     public float range;
     //public float damage;
     public Transform firePoint;
 
-    
-    //[SerializeField] private float fireRate;
-    //[SerializeField] private float coolDown = 0.2f;
     public DetectMode Mod;
     public TowerMode Type;
-    bool doubleShot = false;
 
     [System.Serializable]
     public class BulletRates
@@ -34,6 +31,7 @@ public class TowerBase : MonoBehaviour
     }
     public BulletRates bulletInfo;
     
+
     private void Update()
     {
         if (gameObject.transform.name == "TowerDoubleStandard(Clone)" && bulletInfo.coolDown <= 0f && target != null)
@@ -55,10 +53,13 @@ public class TowerBase : MonoBehaviour
             bulletInfo.coolDown = 1f / bulletInfo.fireRate;
         }
 
-        bulletInfo.coolDown -= Time.deltaTime; // Burada cooldown baþlýyor.
+        bulletInfo.coolDown -= Time.deltaTime; // Cooldown starting
         
     }
 
+    /// <summary>
+    /// Shoots a selected type projectile 
+    /// </summary>
     void Shoot()
     {
         target = lastTarget;
@@ -102,37 +103,21 @@ public class TowerBase : MonoBehaviour
     }
 
 
-
+    /// <summary>
+    /// Sets Enemy as current target.
+    /// </summary>
+    /// <param name="enemy"></param>
     public void SetTarget(Enemy enemy)
     {
         target = enemy;
     }
 
+    /// <summary>
+    /// Returns current Enemy
+    /// </summary>
+    /// <returns></returns>
     public Enemy GetTarget() {
         return target;
     }
 
-    void Set()
-    {
-        if (gameObject.transform.name == "TowerStandard(Clone)")
-        {
-            Type = TowerMode.Standard;
-            findTargetScript.SetType(Type);
-        }
-        else if (gameObject.transform.name == "TowerDoubleStandard(Clone)")
-        {
-            Type = TowerMode.Double;
-            findTargetScript.SetType(Type);
-        }
-        else if (gameObject.transform.name == "TowerPoison(Clone)")
-        {
-            Type = TowerMode.Poison;
-            findTargetScript.SetType(Type);
-        }
-        else if (gameObject.transform.name == "TowerAreaOfEffect(Clone)")
-        {
-            Type = TowerMode.Area;
-            findTargetScript.SetType(Type);
-        }
-    }
 }

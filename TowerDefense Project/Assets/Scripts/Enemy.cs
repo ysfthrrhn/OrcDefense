@@ -14,9 +14,6 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private HealthBar healthBar;
     
-    [SerializeField]    
-    private Animator animator;
-
     private Coin coin;
     
     [Tooltip("Coin to be Earned When Killed")]
@@ -32,15 +29,33 @@ public class Enemy : MonoBehaviour
     private Material objectMaterial;
 
     Coroutine healthBarCoroutine;
-    // Start is called before the first frame update
+
+    private PathFinding m_pathFinding;
+    private Animator m_animator;
+    private Collider m_collider;
+    private Rigidbody m_rigidBody;
+    private NavMeshAgent m_agent;
+
+    // Getting necessery components
+    private void Awake()
+    {
+        m_pathFinding = GetComponent<PathFinding>();
+        m_animator = transform.GetChild(0).GetComponent<Animator>();
+        m_collider = GetComponent<Collider>();
+        m_rigidBody = GetComponent<Rigidbody>();
+        
+        objectMaterial = new Material(enemyRenderer.sharedMaterial); // Creating clone of enemy material.
+        enemyRenderer.sharedMaterial = objectMaterial;// Sssigning the material.
+    }
+    
+    // Getting coin Instance at start once.
     void Start()
     {
         coin = Coin.Instance;
-        objectMaterial = new Material(enemyRenderer.sharedMaterial);
-        enemyRenderer.sharedMaterial = objectMaterial;
+        
     }
     
-    // Update is called once per frame
+    // Check for is enemy dead
     void Update()
     {
         
@@ -49,6 +64,16 @@ public class Enemy : MonoBehaviour
             Die();
         }
     }
+
+    /// <summary>
+    /// Deal damage to Enemy.
+    /// </summary>
+    /// <param name="damage"></param>
+    /// <param name="poisonDamage"></param>
+    /// <param name="poisonDuration"></param>
+    /// <param name="slowingRate"></param>
+    /// <param name="armorPiercing"></param>
+    /// <param name="bulletType"></param>
     public void GetDamage(float damage, float poisonDamage, float poisonDuration, float slowingRate, float armorPiercing, TowerMode bulletType)
     {
         if(healthBarCoroutine != null)
@@ -66,6 +91,10 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Deals normal damage.
+    /// </summary>
+    /// <param name="damage"></param>
     void NormalDamageTaken(float damage)
     {
         float takenDamage = damage;
@@ -74,15 +103,31 @@ public class Enemy : MonoBehaviour
         Invoke(nameof(ReverseDamageEffect), .2f);
         healthBar.UpdateHealthBar(currentHealth / baseHealth);
     }
+
+    /// <summary>
+    /// Deals posion damage.
+    /// </summary>
     void ReverseDamageEffect()
     {
         objectMaterial.SetInt("_Is_Damaged", 0);
     }
 
+    /// <summary>
+    /// Setting damage per 0.5 seconds. (For poison damage)
+    /// </summary>
+    /// <param name="damageAmount"></param>
+    /// <param name="damageDuration"></param>
     public void DamageOverTime(float damageAmount, float damageDuration)
     {
         StartCoroutine (DamageOverTimeCoroutine(damageAmount, damageDuration));
     }
+
+    /// <summary>
+    /// Setting damage per 0.5 seconds. (For poison damage)
+    /// </summary>
+    /// <param name="damageAmount"></param>
+    /// <param name="damageDuration"></param>
+    /// <returns></returns>
     IEnumerator DamageOverTimeCoroutine(float damageAmount, float damageDuration)
     {
         float amountDamaged = 0;
@@ -95,6 +140,12 @@ public class Enemy : MonoBehaviour
         }
         
     }
+
+    /// <summary>
+    /// Enables health bar for desired time.
+    /// </summary>
+    /// <param name="delay"></param>
+    /// <returns></returns>
     IEnumerator HealthBarActivator(float delay)
     {
         healthBar.gameObject.SetActive(true);
@@ -102,7 +153,9 @@ public class Enemy : MonoBehaviour
         healthBar.gameObject.SetActive(false);
     }
 
-    //Things do when enemy is dead
+    /// <summary>
+    /// Sets enemy to die state.
+    /// </summary>
     public void Die()
     {
         ReverseDamageEffect();
@@ -110,20 +163,25 @@ public class Enemy : MonoBehaviour
         
 
         isDead = true;
-        agentSpeed = gameObject.GetComponent<PathFinding>().agent.speed;
-        gameObject.GetComponent<PathFinding>().agent.speed = 0;
-        gameObject.transform.GetChild(0).GetComponent<Animator>().Play("Die");
+        agentSpeed = m_pathFinding.agent.speed;
+        m_pathFinding.agent.speed = 0;
+        m_animator.Play("Die");
 
-        gameObject.GetComponent<Collider>().enabled = false;
-        gameObject.GetComponent<Rigidbody>().isKinematic = true;
-        gameObject.GetComponent<Rigidbody>().useGravity = false;
-        gameObject.GetComponent<NavMeshAgent>().enabled = false;
+        m_collider.enabled = false;
+        m_rigidBody.isKinematic = true;
+        m_rigidBody.useGravity = false;
+        m_agent.enabled = false;
         healthBar.gameObject.SetActive(false);
 
         coin.SetCoin(point);
 
         StartCoroutine(Dissolve());
     }
+
+    /// <summary>
+    /// Sets Shader state to dissolve when enemy dies.
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Dissolve()
     {
         float t = 0;
@@ -138,6 +196,10 @@ public class Enemy : MonoBehaviour
 
         ResetBeforePool();
     }
+
+    /// <summary>
+    /// Resets enemy to default before adding to pool.
+    /// </summary>
     private void ResetBeforePool()
     {
         StopAllCoroutines();
@@ -150,12 +212,12 @@ public class Enemy : MonoBehaviour
         currentHealth = baseHealth;
         healthBar.gameObject.SetActive(false);
 
-        gameObject.GetComponent<PathFinding>().agent.speed = agentSpeed;
+        m_pathFinding.agent.speed = agentSpeed;
 
-        gameObject.GetComponent<Collider>().enabled = true;
-        gameObject.GetComponent<Rigidbody>().isKinematic = false;
-        gameObject.GetComponent<Rigidbody>().useGravity = true;
-        gameObject.GetComponent<NavMeshAgent>().enabled = true;
+        m_collider.enabled = true;
+        m_rigidBody.isKinematic = false;
+        m_rigidBody.useGravity = true;
+        m_agent.enabled = true;
 
         PoolManager.Instance.ReturnEnemyToPool(gameObject);
     }

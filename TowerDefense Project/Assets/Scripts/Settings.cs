@@ -7,7 +7,8 @@ public class Settings : MonoBehaviour
 {
     bool VSync = false;
     public GameObject isVSyncbject;
-    private void Start()
+
+    private void Start() // Set settings at start
     {
         if(GetVSync() == 1)
             VSync = true;
@@ -15,6 +16,9 @@ public class Settings : MonoBehaviour
         UpdateSettings();
     }
 
+    /// <summary>
+    /// Updates settings
+    /// </summary>
     public void UpdateSettings()
     {
         if (VSync)
@@ -29,15 +33,28 @@ public class Settings : MonoBehaviour
         }
         SetPlayerPrefs();
     }
+
+    /// <summary>
+    /// Returns current value of VSync from PlayerPrefs
+    /// </summary>
+    /// <returns></returns>
     public int GetVSync()
     {
         return PlayerPrefs.GetInt("VSync");
     }
+
+    /// <summary>
+    /// Change Current VSync value
+    /// </summary>
     public void ChangeVSync()
     {
         VSync = !VSync;
         UpdateSettings();
     }
+
+    /// <summary>
+    /// Sets VSync value to PlayerPrefs.
+    /// </summary>
     public void SetPlayerPrefs()
     {
         int value;
@@ -45,6 +62,10 @@ public class Settings : MonoBehaviour
         PlayerPrefs.SetInt("VSync", value = VSync ? 1 : 0);
         PlayerPrefs.Save();
     }
+
+    /// <summary>
+    /// Resets PlayerPrefs for resetting game save.
+    /// </summary>
     public void ResetPlayerPrefs()
     {
         PlayerPrefs.DeleteAll();

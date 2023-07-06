@@ -8,25 +8,30 @@ public class FindTarget : MonoBehaviour
     private Enemy enemy;
     [SerializeField] private DetectMode mode;
     [SerializeField] private List<Enemy> enemies;
-    private Enemy selectedTarget; //Bu deðiþken en güçlü ve en zayýfý bulurken deðer tutacak
+    private Enemy selectedTarget; // This variable for store storngest enemy into targets.
     public Transform partToRotate;
     public float aimSpeed;
     public TowerMode Type;
 
     private void Start()
     {
-        InvokeRepeating(nameof(UpdateTarget), 0, 0.5f);
+        InvokeRepeating(nameof(UpdateTarget), 0, 0.5f); // Updates target per 0.5 seconds
         mode = ParentTower.Mod;
     }
+
+
     private void Update()
     {
-        foreach(Enemy enemy in enemies.ToArray())
+        // Checking is targets still alive
+        foreach(Enemy enemy in enemies.ToArray())// Add listener for Next Version!!!!
         {
             if (enemy.currentHealth <= 0)
             {
                 DeleteEnemy(enemy);
             }
         }
+
+        // Aiming to target
         if (selectedTarget != null)
         {
             if(Type != TowerMode.Area)
@@ -47,6 +52,9 @@ public class FindTarget : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Sets current target by selected DetectMode.
+    /// </summary>
     private void UpdateTarget()
     {
         switch (mode)
@@ -132,6 +140,7 @@ public class FindTarget : MonoBehaviour
 
     }
 
+    // Removes enemy that is out of range, from targets
     private void OnTriggerExit(Collider other)
     {
         ParentTower.SetTarget(null);
@@ -139,22 +148,35 @@ public class FindTarget : MonoBehaviour
         DeleteEnemy(delete);
     }
 
-    public void SetMode(DetectMode m) //Bunu oyun içinde deðiþtirildiðinde kullanýp deðiþtiricez
-    {                                        // TowerBase içinden çaðýrýrýz
+    /// <summary>
+    /// Changes Tower target detection type.
+    /// </summary>
+    /// <param name="m"></param>
+    public void SetMode(DetectMode m) 
+    {                                        
         mode = m;
     }
-    public void SetType(TowerMode m) //Bunu oyun içinde deðiþtirildiðinde kullanýp deðiþtiricez
-    {                                        // TowerBase içinden çaðýrýrýz
+
+    /// <summary>
+    /// Sets selected tower type.
+    /// </summary>
+    /// <param name="m"></param>
+    public void SetType(TowerMode m) 
+    {                                        
         Type = m;
     }
 
+    /// <summary>
+    /// Remove enemy from target list.
+    /// </summary>
+    /// <param name="enemy"></param>
     public void DeleteEnemy(Enemy enemy)
     {
         for(int i=0; i < enemies.Count; i++)
         {
             if(enemy == enemies[i])
             {
-                enemies.Remove(enemy); //hedef ölür veya alandan çýkarsa Hedef bu scripti kendi çaðýrýp adýný sildirecek
+                enemies.Remove(enemy);
                 if (ParentTower.GetTarget() == enemy)
                 {
                     ParentTower.SetTarget(null);

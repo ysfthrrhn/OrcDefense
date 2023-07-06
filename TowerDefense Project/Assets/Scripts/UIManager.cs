@@ -32,6 +32,8 @@ public class UIManager : MonoBehaviour
         if (Instance == null)
             Instance = this;
     }
+
+    // Starts UI. For opening right panel. (Menu or InGame)
     private void Start()
     {
         if(inGameMenuPanel != null)
@@ -39,21 +41,42 @@ public class UIManager : MonoBehaviour
         else
             mainMenuPanel.SetActive(true);
     }
+
+    /// <summary>
+    /// Loads level by given Index.
+    /// </summary>
+    /// <param name="index"></param>
     public void LoadLevelByIndex(int index)
     {
         OpenLoadingPanel();
         StartCoroutine(LoadScene(index));
     }
+
+    /// <summary>
+    /// Loads level by given Index.
+    /// </summary>
+    /// <param name="index"></param>
     public void LoadNextLevel()
     {
         OpenLoadingPanel();
         StartCoroutine(LoadScene(SceneManager.GetActiveScene().buildIndex + 1));
     }
+
+    /// <summary>
+    /// Loads current level.
+    /// </summary>
+    /// <param name="index"></param>
     public void LoadCurrentScene()
     {
         OpenLoadingPanel();
         StartCoroutine(LoadScene(SceneManager.GetActiveScene().buildIndex));
     }
+
+    /// <summary>
+    /// Prepare for loading scene and loads scene by Index.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
     private IEnumerator LoadScene(int index)
     {
         if (GameManager.Instance)
@@ -70,6 +93,8 @@ public class UIManager : MonoBehaviour
         }
         
     }
+
+    // Panel changers
     private void OpenLoadingPanel()
     {
         ClearUI();
@@ -116,17 +141,27 @@ public class UIManager : MonoBehaviour
         settingsPanel.SetActive(true);
     }
     
+    /// <summary>
+    /// Disables all childs of Transform(Canvas).
+    /// </summary>
     public void ClearUI()
     {
         foreach(Transform panel in transform)
             panel.gameObject.SetActive(false);
     }
 
+    /// <summary>
+    /// Quits the application.
+    /// </summary>
     public void Quit()
     {
         Application.Quit();
     }
 
+    /// <summary>
+    /// Changes timeScale with desired value.
+    /// </summary>
+    /// <param name="speed"></param>
     public void ChangeGameSpeed(float speed)
     {
         foreach (Button button in gameSpeedButtons)

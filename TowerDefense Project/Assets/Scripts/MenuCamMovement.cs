@@ -11,7 +11,8 @@ public class MenuCamMovement : MonoBehaviour
 
     public float camSpeed;
     private bool _noNeedToMove;
-    // Start is called before the first frame update
+   
+    // Sets moving camera to start
     private void Start()
     {
         _noNeedToMove = false;
@@ -19,16 +20,16 @@ public class MenuCamMovement : MonoBehaviour
         _currentWaypointIndex = 0;
     }
 
-    // Update is called once per frame
+    // Move the cam
     private void Update()
     {
         if (_targetWaypoint != null && !_noNeedToMove)
         {
             FaceTheWay();
-            Vector3 directions = _targetWaypoint.position - transform.position; // kameraya hedefe yönlendirdik
-            transform.Translate(directions.normalized * Time.deltaTime * camSpeed, Space.World); // kamerayı hareket ettiriyoruz
+            Vector3 directions = _targetWaypoint.position - transform.position; // Directing the camera to the targetPoint
+            transform.Translate(directions.normalized * Time.deltaTime * camSpeed, Space.World); // Moving the camera
             
-            if (Vector3.Distance(transform.position, _targetWaypoint.position) < 0.2f) // kameranın hedefe ulaşıp ulaşmadığını kontrol ediyoruz
+            if (Vector3.Distance(transform.position, _targetWaypoint.position) < 0.2f) // Checking is camera reached to the targetPoint
             {
                 GetNextWaypoint();
             }
@@ -38,19 +39,19 @@ public class MenuCamMovement : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Make the camera look at the target.
+    /// </summary>
     private void FaceTheWay()
     {
-        //Make the camera look at the target
         var direction = _targetWaypoint.position - transform.position;
         var lookRotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * camSpeed);
-        
+        transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * camSpeed);   
     }
     
-    public void ChangeMovingStatus(bool status)
-    {
-        _noNeedToMove = status;
-    }
+    /// <summary>
+    /// Sets next point as a new target to Camera
+    /// </summary>
     private void GetNextWaypoint()
     {
         if (_currentWaypointIndex >= waypointHolder.GetComponent<Waypoints>().waypoints.Length - 1) // eğer son hedefe ulaşıldıysa
